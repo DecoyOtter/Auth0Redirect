@@ -1,0 +1,117 @@
+<html>
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Auth0 Redirect</title>
+    <style>
+        html body {
+            background-color: gray;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+        
+        .lds-ripple {
+            display: inline-block;
+            position: relative;
+            width: 80px;
+            height: 80px;
+        }
+        
+        .lds-ripple div {
+            position: absolute;
+            border: 4px solid #fff;
+            opacity: 1;
+            border-radius: 50%;
+            animation: lds-ripple 1s cubic-bezier(0, 0.2, 0.8, 1) infinite;
+        }
+        
+        .lds-ripple div:nth-child(2) {
+            animation-delay: -0.5s;
+        }
+        
+        @keyframes lds-ripple {
+            0% {
+                top: 36px;
+                left: 36px;
+                width: 0;
+                height: 0;
+                opacity: 1;
+            }
+            100% {
+                top: 0px;
+                left: 0px;
+                width: 72px;
+                height: 72px;
+                opacity: 0;
+            }
+        }
+    </style>
+    <meta>
+</head>
+
+<body onfocusout="parent.setEmailRange();" style="overflow-wrap: break-word;">
+    <div class="lds-ripple">
+        <div></div>
+        <div></div>
+    </div>
+
+    <script lang="javacript">
+        // var code = null;
+
+        window.addEventListener('load', (event) => {
+            console.log('page is fully loaded');
+            var url = window.location.href;
+
+            const queryString = window.location.search;
+            const urlParams = new URLSearchParams(queryString);
+
+            const code = urlParams.get('code');
+            console.log(code);
+
+            var d = new Date();
+            d.setTime(d.getTime() + (365 * 24 * 60 * 60 * 1000));
+            var expires = d.toUTCString();
+
+            document.cookie = 'code=' + code + '; expires=' + expires + ';path=/Auth0/';
+            localStorage.setItem("code", code);
+            sessionStorage.setItem("code", code);
+            getToken(code);
+
+        })
+
+        function getToken(code) {
+
+            var myHeaders = new Headers();
+            myHeaders.append("content-type", "application/x-www-form-urlencoded");
+            myHeaders.append("Cookie", "auth0=s%3Av1.gadzZXNzaW9ugqZoYW5kbGXEQHO_1_XgrCwZRtpwXoRaAytdwT4_FQLFizxXY_23hB_4d1Aa5MryVOiwKI3VYB4BskegBVKTb89gMz6R-LkyN8imY29va2llg6dleHBpcmVz1_9BU6IAYMwtp65vcmlnaW5hbE1heEFnZc4PcxQAqHNhbWVTaXRlpG5vbmU.%2FmqyM4OM%2FcL8ad40ADEOWQLxp9RD%2FgZbCjif6jGVWgU; auth0_compat=s%3Av1.gadzZXNzaW9ugqZoYW5kbGXEQHO_1_XgrCwZRtpwXoRaAytdwT4_FQLFizxXY_23hB_4d1Aa5MryVOiwKI3VYB4BskegBVKTb89gMz6R-LkyN8imY29va2llg6dleHBpcmVz1_9BU6IAYMwtp65vcmlnaW5hbE1heEFnZc4PcxQAqHNhbWVTaXRlpG5vbmU.%2FmqyM4OM%2FcL8ad40ADEOWQLxp9RD%2FgZbCjif6jGVWgU; did=s%3Av0%3A8ac4af00-ca67-11eb-b8fd-7b5cb2a31a6b.w2aVidEX5jIJtWvidG20KBP2Fg5KEXQPsIVsQFC55Zk; did_compat=s%3Av0%3A8ac4af00-ca67-11eb-b8fd-7b5cb2a31a6b.w2aVidEX5jIJtWvidG20KBP2Fg5KEXQPsIVsQFC55Zk");
+
+            var urlencoded = new URLSearchParams();
+            urlencoded.append("grant_type", "authorization_code");
+            urlencoded.append("client_id", "jeroBzjsQzoO20DqmFmyvW30TgJ62ks1");
+            urlencoded.append("client_secret", "6m_AApQ1YX5XBFpX3YKwc63MQ_vhhxHhY8YGlciF5GkdP20JDYDumEbxPmNOCozw");
+            urlencoded.append("code", code);
+            urlencoded.append("redirect_uri", "http://127.0.0.1:51928/Auth0CodeRedirect.html");
+            urlencoded.append("scope", "email profile openid");
+
+            var requestOptions = {
+                method: 'POST',
+                headers: myHeaders,
+                body: urlencoded,
+                redirect: 'follow'
+            };
+
+            fetch("https://moneytech-staging.au.auth0.com/oauth/token", requestOptions)
+                .then(response =>
+                    response.text()
+                )
+                .then(result => console.log(result))
+                .catch(error => console.log('error', error));
+        };
+    </script>
+
+</body>
+
+</html>
